@@ -4,6 +4,7 @@ module Streaming.Zip (
     -- * Streams
       decompress
     , decompress'
+    , decompressAll
     , compress
     , gunzip
     , gunzip'
@@ -82,6 +83,14 @@ decompress' wbits p0 = go p0 =<< liftIO (Z.initInflate wbits)
                then go p' inf
                else return $ Left (chunk leftover >> p')
 {-# INLINABLE decompress' #-}
+
+-- | Keep decompressing a compressed bytestream until exhausted.
+decompressAll :: MonadIO m => Z.WindowBits -> ByteString m r -> ByteString m r
+decompressAll w bs = decompress' w bs >>= go
+  where
+    go (Left bs) = decompress' w bs >>= go
+    go (Right r) = return r
+{-# INLINABLE decompressAll #-}
 
 -- | Compress a byte stream.
 --

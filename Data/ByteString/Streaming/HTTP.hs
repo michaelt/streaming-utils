@@ -1,4 +1,4 @@
-{-#LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE OverloadedStrings #-}
 -- | This module replicates `pipes-http` as closely as will type-check, adding a
 --   conduit-like @http@ in @ResourceT@ and a primitive @simpleHTTP@ that emits
 --   a streaming bytestring rather than a lazy one. 
@@ -38,7 +38,7 @@
 -- > import Data.ByteString.Streaming.HTTP
 -- >
 -- > main = do
--- >   req <- parseUrl "https://www.example.com"
+-- >   req <- parseUrlThrow "https://www.example.com"
 -- >   m <- newManager tlsManagerSettings 
 -- >   runResourceT $ do
 -- >      resp <- http request manager 
@@ -205,7 +205,7 @@ import Data.ByteString.Streaming.HTTP
 simpleHTTP :: MonadResource m => String -> ByteString m ()
 simpleHTTP url = do
     man <- liftIO (newManager tlsManagerSettings)
-    req <- liftIO (parseUrl url)
+    req <- liftIO (parseUrlThrow url)
     bracketByteString 
        (responseOpen req man) 
        responseClose 

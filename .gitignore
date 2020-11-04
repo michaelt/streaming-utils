@@ -1,4 +1,6 @@
 dist
+dist-newstyle
+*.ghc*
 cabal-dev
 *.o
 *.hi
